@@ -46,7 +46,10 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status, 'Request failed. Please try again.');
+    throw new ApiError(
+      response.status,
+      `Request failed (HTTP ${response.status}). Please try again.`
+    );
   }
   return (await response.text()) as unknown as T;
 }

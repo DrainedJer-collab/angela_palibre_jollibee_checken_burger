@@ -14,8 +14,25 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-export const db = new Database(resolvedDbPath);
+function openDatabase(dbPath: string): Database.Database {
+  try {
+    return new Database(dbPath);
+  } catch (err) {
+    const prebuildCandidate = path.resolve(
+      process.cwd(),
+      'node_modules/better-sqlite3/prebuilds',
+      `${process.platform}-${process.arch}.node`
+    );
+    if (fs.existsSync(prebuildCandidate)) {
+      return new Database(dbPath, { nativeBinding: prebuildCandidate });
+    }
+    throw err;
+  }
+}
 
+export const db = openDatabase(resolvedDbPath);
+
+db.pragma('busy_timeout = 5000');
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
