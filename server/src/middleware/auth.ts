@@ -8,7 +8,18 @@ const fallbackSecret = crypto.randomBytes(32).toString('hex');
 
 function getJwtSecret(): string {
   const configured = process.env.JWT_SECRET?.trim();
-  return configured && configured.length >= 16 ? configured : fallbackSecret;
+  if (configured && configured.length >= 16) {
+    return configured;
+  }
+  const deploymentSeed =
+    process.env.VERCEL_PROJECT_ID ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL;
+  if (deploymentSeed) {
+    return crypto.createHash('sha256').update(`tsc-jwt:${deploymentSeed}`).digest('hex');
+  }
+  return fallbackSecret;
 }
 
 export const COOKIE_NAME = 'tsc_auth';

@@ -2,8 +2,12 @@ import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 
-const configuredPath = process.env.DB_PATH || './data/tingloy.db';
-const resolvedDbPath = path.resolve(process.cwd(), configuredPath);
+const isVercel = Boolean(process.env.VERCEL);
+const configuredPath = process.env.DB_PATH?.trim();
+const resolvedDbPath =
+  isVercel && (!configuredPath || !configuredPath.startsWith('/tmp/'))
+    ? '/tmp/tingloy.db'
+    : path.resolve(process.cwd(), configuredPath || './data/tingloy.db');
 const dbDir = path.dirname(resolvedDbPath);
 
 if (!fs.existsSync(dbDir)) {

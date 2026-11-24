@@ -3,36 +3,11 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import { seedDatabase } from './server/src/db/seed.js';
-import { errorHandler } from './server/src/middleware/errorHandler.js';
-import { apiRouter } from './server/src/routes/api.js';
+import { createApiApp } from './server/src/app.js';
 
 async function startServer(): Promise<void> {
-  // Initialize SQLite schema and seed sample data on first run
-  seedDatabase(false);
-
-  const app = express();
+  const app = createApiApp();
   const port = Number(process.env.PORT) || 3000;
-
-  app.set('trust proxy', 1);
-  app.use(express.json({ limit: '1mb' }));
-  app.use(express.urlencoded({ extended: true }));
-
-  // Health endpoint
-  app.get('/api/health', (_req, res) => {
-    res.status(200).json({ status: 'ok', service: 'tingloy-sea-connect' });
-  });
-
-  // REST API routes
-  app.use('/api', apiRouter);
-
-  // Unknown API endpoints return JSON 404
-  app.use('/api/*', (_req, res) => {
-    res.status(404).json({ error: 'API endpoint not found.' });
-  });
-
-  // Centralized error handler
-  app.use(errorHandler);
 
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
