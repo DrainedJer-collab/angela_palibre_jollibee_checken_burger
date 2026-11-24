@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Tingloy Sea Connect",
+  "description": "Official boat transportation coordination, schedules, safety guidelines, and e-ticket booking platform for Mabini Port to Barangay San Juan and Masasa Beach, Tingloy, Batangas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
